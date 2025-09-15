@@ -2,11 +2,12 @@
 
 using Mini_aventyr;
 
-Console.WriteLine();
+// 1. Create an instance of our new creator.
+var creator = new CharacterCreator();
 
-Weapon weapon = new Weapon("My weapon", 1);
-Loot loot = new Loot(0, weapon);
-Player player = new Player(new Health(100, 90), "Class", "Player 1", loot);
+// 2. Let the creator class handle the entire setup process.
+Player player = creator.CreatePlayer();
+
+// 3. Create and start the game with the fully customized player.
 Game game = new(player);
-
 game.Start();
