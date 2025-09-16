@@ -89,21 +89,25 @@ public class Game {
             }
             break; // The break for the "study" case
             case "eat":
-            if (parts.Length < 2 || !int.TryParse(parts[1], out int foodIndex)) {
+            if (parts.Length < 2 || !int.TryParse(parts[1], out int index)) {
                 Console.WriteLine("Eat what? Try 'eat <number>'.");
                 return false;
             }
 
-            foodIndex -= 1; // adjusted for 0 based list
-
-            if (foodIndex >= 0 && foodIndex < _player.Loot.Food.Count) {
-                var foodToEat = _player.Loot.Food[foodIndex];
-                _player.Health.Eat(foodToEat);
-                _player.Loot.Food.RemoveAt(foodIndex);
-                Console.WriteLine($"You eat the {foodToEat.Name} and gain {foodToEat.Energy} energy.");
+            index -= 1; // adjusted for 0 based list
+            if (index >= 0 && index < _player.Loot.Items.Count) {
+                var selectedItem = _player.Loot.Items[index];
+                if (selectedItem is Food food) {
+                    _player.Health.Eat(food);
+                    _player.Loot.Items.RemoveAt(index);
+                    Console.WriteLine($"You eat the {food.Name} and gain {food.Energy} energy.");
+                }
+                else {
+                    Console.WriteLine($"Biting down on the {selectedItem.Name} confirms your suspicion that it is, in fact, not edible.");
+                }
             }
             else {
-                Console.WriteLine("You don't have food in that slot.");
+                Console.WriteLine("Your hand meets nothing but the inside of your pack.");
                 return false;
             }
             break;
@@ -128,8 +132,8 @@ public class Game {
                 Console.WriteLine($"You swing your {_player.Loot.Weapon.Name} harmlessly in the air.");
             }
             else {
-                // targeting a specific enemy.
-                int targetIndex = 0; // default to the first enemy.
+                // targeting a specific enemy
+                int targetIndex = 0; // default to the first enemy
                 if (parts.Length > 1 && int.TryParse(parts[1], out int chosenIndex)) {
                     targetIndex = chosenIndex - 1; // adjust to 0 index
                 }
@@ -248,7 +252,7 @@ public class Game {
             _groundLoot.Add(enemy.Loot.Weapon);
             Console.WriteLine($"The {enemy.Name} dropped its {enemy.Loot.Weapon.Name}.");
 
-            foreach (var item in enemy.Loot.Food) {
+            foreach (var item in enemy.Loot.Items) {
                 Console.WriteLine($"The {enemy.Name} dropped {item.Name}!");
                 _groundLoot.Add(item);
             }
@@ -268,10 +272,10 @@ public class Game {
         Console.WriteLine($"Health: {_player.Health.HP}/{_player.Health.MaxHP} | Energy: {_player.Health.Energy}");
         Console.WriteLine($"Gold: {_player.Loot.Gold}");
         Console.WriteLine($"Equipped: {_player.Loot.Weapon.Name} (Damage: {_player.Loot.Weapon.BaseDamage})");
-        if (_player.Loot.Food.Any()) {
-            Console.WriteLine($"Your Food {_player.Loot.Food.Count}/{_player.Loot.MaxFood}:");
-            for (int i = 0; i < _player.Loot.Food.Count; i++) {
-                Console.WriteLine($"[{i + 1}] {_player.Loot.Food[i].Details()}");
+        if (_player.Loot.Items.Any()) {
+            Console.WriteLine($"Your Items {_player.Loot.Items.Count}/{_player.Loot.MaxFood}:");
+            for (int i = 0; i < _player.Loot.Items.Count; i++) {
+                Console.WriteLine($"[{i + 1}] {_player.Loot.Items[i].Details()}");
             }
         }
         Console.WriteLine("\n----------------");
@@ -296,7 +300,7 @@ public class Game {
 
         // show available commands.
         string actions = "Actions: [adv], [rest], [run], [quit]";
-        if (_player.Loot.Food.Any()) actions += ", [eat <number>]";
+        if (_player.Loot.Items.Any()) actions += ", [eat <number>]";
         if (_activeEnemies.Any()) actions += ", [attack <enemyNumber>]";
         if (_activeEnemies.Any()) actions += ", [study <enemyNumber>]";
         if (_groundLoot.Any()) actions += ", [take <number>]";

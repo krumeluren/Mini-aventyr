@@ -19,17 +19,17 @@ public class EnemyFactory {
             var weaponData = GameData.Weapons[_random.Next(GameData.Weapons.Count)];
             var enemyWeapon = new Weapon(weaponData.Name, weaponData.Damage);
 
-            var foodItemsToDrop = new List<Food>();
+            var itemsToDrop = new List<Item>();
             int foodDropCount = _random.Next(enemyBase.MinLoot, enemyBase.MaxLoot + 1); // +1 because the random upper range is exclusive
 
             // create that many random food items.
             for (int j = 0; j < foodDropCount; j++) {
                 var foodData = GameData.Food[_random.Next(GameData.Food.Count)];
-                foodItemsToDrop.Add(new Food(foodData.Name, foodData.Energy));
+                itemsToDrop.Add(new Food(foodData.Name, foodData.Energy));
             }
 
             int goldAmount = _random.Next(enemyBase.MinGold, enemyBase.MaxGold);
-            var enemyLoot = new Loot(goldAmount, enemyWeapon, foodItemsToDrop, enemyBase.MaxLoot);
+            var enemyLoot = new Loot(goldAmount, enemyWeapon, itemsToDrop, enemyBase.MaxLoot);
 
             float randomizedStr = RandomizeStat(enemyBase.Str);
             float randomizedDex = RandomizeStat(enemyBase.Dex);

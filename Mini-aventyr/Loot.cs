@@ -8,13 +8,13 @@ public class Loot {
     public Weapon Weapon { get; set; }
 
     public int MaxFood { get; }
-    public readonly List<Food> Food = new();
+    public readonly List<Item> Items = new();
 
-    public Loot (int gold, Weapon weapon, List<Food> foods, int maxFood = 3) {
+    public Loot (int gold, Weapon weapon, List<Item> items, int maxItems = 3) {
         Weapon = weapon;
         Gold = gold;
-        Food = foods;
-        MaxFood = maxFood;
+        Items = items;
+        MaxFood = maxItems;
     }
 
     /// <returns>A potential item that was dropped</returns>
@@ -24,15 +24,15 @@ public class Loot {
             dropped = Weapon;
             Weapon = weapon;
         }
-        else if (newItem is Food food) {
-            if (Food.Count >= MaxFood) {
+        else {
+            if (Items.Count >= MaxFood) {
                 // bag is full get the last item
-                dropped = Food[Food.Count - 1];
+                dropped = Items[Items.Count - 1];
                 // Remove it from the inventory.
-                Food.RemoveAt(Food.Count - 1);
+                Items.RemoveAt(Items.Count - 1);
             }
             // Add the new food to the front of the list
-            Food.Insert(0, food);
+            Items.Insert(0, newItem);
         }
         // return the item that was dropped or null
         return dropped;
