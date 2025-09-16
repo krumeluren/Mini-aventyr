@@ -12,8 +12,8 @@
         string primary = sortedStats[0].Key;
         string secondary = sortedStats[1].Key;
 
-        // Check for a "Pure" class if the primary stat is significantly higher than the secondary
-        if (sortedStats[0].Value > sortedStats[1].Value * 1.15f) {
+        // Check for a "pure" class if the primary stat is significantly higher than the secondary
+        if (sortedStats[0].Value > sortedStats[1].Value * 1.2f) {
             switch (primary) {
                 case "Strength": return "Barbarian";
                 case "Dexterity": return "Duelist";

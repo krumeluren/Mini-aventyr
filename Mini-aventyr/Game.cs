@@ -1,7 +1,12 @@
-﻿namespace Mini_aventyr;
+﻿using Mini_aventyr.Entities;
+using Mini_aventyr.Items;
+
+namespace Mini_aventyr;
 
 public class Game {
     private readonly Player _player;
+
+    private readonly GameSettings _settings;
 
     private readonly Random _random = new();
     private readonly EnemyFactory _enemyFactory = new();
@@ -10,12 +15,15 @@ public class Game {
 
     private readonly List<Item> _groundLoot = new();
 
-    public Game (Player player) {
+    public Game (Player player, GameSettings settings) {
         _player = player;
+        _settings = settings;
     }
 
     public void Start () {
         bool isRunning = true;
+        bool failedPrev = false;
+
         while (isRunning && !_player.Health.IsDead) {
             DisplayGeneralStatus();
 
@@ -26,8 +34,8 @@ public class Game {
                 isRunning = false;
                 continue;
             }
-
-            if (!ProcessPlayerAction(input)) {
+            failedPrev = !ProcessPlayerAction(input, failedPrev);
+            if (failedPrev) {
                 Console.WriteLine("\n(Press Enter to retry...)");
                 Console.ReadLine();
                 continue;
@@ -46,15 +54,23 @@ public class Game {
         DisplayGameOver();
     }
 
-    /// <returns>If the loop should continue</returns>
-    private bool ProcessPlayerAction (string input) {
+    /// <returns>If the loop should succeded</returns>
+    private bool ProcessPlayerAction (string input, bool failedPrevious) {
         Console.WriteLine("\n--- Your Turn ---");
 
         string[] parts = input.Split(' ');
         string command = parts.FirstOrDefault() ?? string.Empty;
 
-        _player.Health.Exhaust(1); // each turn you lose basal energy
-        _player.Health.Heal(1); // Passive healing
+        if (!failedPrevious) {
+            _player.Health.Exhaust(1); // each turn you lose basal energy
+            _player.Health.PassiveChanges();
+        }
+
+        if (_player.Health.Energy <= 5) {
+            Console.WriteLine("You are so tired you pass out on the ground.");
+            _player.Health.Rest();
+            return true;
+        }
 
         switch (command) {
             case "study":
@@ -74,7 +90,7 @@ public class Game {
 
                 // A baseline character perception (1.0) has a 50% chance of success
                 const float baseSuccessChance = 0.5f;
-                float actualSuccessChance = baseSuccessChance * _player.Health.Perception;
+                float actualSuccessChance = baseSuccessChance * _player.Health.Perception * _player.Health.Luck;
                 if (_random.NextDouble() < actualSuccessChance) {
                     target.IsAnalyzed = true;
                     Console.WriteLine($"You focus your mind... DING! You now understand the {target.Name}'s capabilities.");
@@ -98,9 +114,31 @@ public class Game {
             if (index >= 0 && index < _player.Loot.Items.Count) {
                 var selectedItem = _player.Loot.Items[index];
                 if (selectedItem is Food food) {
-                    _player.Health.Eat(food);
-                    _player.Loot.Items.RemoveAt(index);
-                    Console.WriteLine($"You eat the {food.Name} and gain {food.Energy} energy.");
+                    bool didConsume = _player.Health.Consume(food);
+                    if (didConsume) {
+                        _player.Loot.Items.RemoveAt(index);
+
+                        var effects = new List<string>();
+                        if (food.Healing > 0) effects.Add($"healing {food.Healing} HP");
+                        if (food.Energy > 0) effects.Add($"restoring {food.Energy} energy");
+                        if (food.Satiety > 0) effects.Add($"filling you up by {food.Satiety}");
+                        string effectsString = string.Join(", ", effects);
+
+                        if (!string.IsNullOrEmpty(effectsString)) {
+                            Console.WriteLine($"You consume the {food.Name}, {effectsString}.");
+                        }
+                        else {
+                            Console.WriteLine($"You consume the {food.Name}.");
+                        }
+
+                        if (_player.Health.IsBloated) {
+                            Console.WriteLine("You feel bloated and can't eat another bite.");
+                        }
+                    }
+
+                    if (_player.Health.IsBloated)
+                        Console.WriteLine("You feel bloated and can't eat another bite.");
+
                 }
                 else {
                     Console.WriteLine($"Biting down on the {selectedItem.Name} confirms your suspicion that it is, in fact, not edible.");
@@ -121,7 +159,7 @@ public class Game {
                 ClearAreaState(); // Cant go back for loot if you run         
                 Console.WriteLine("You venture into the wild...");
                 _player.Health.Exhaust(10); // adventure exhaust
-                var newEnemies = _enemyFactory.GetEnemies(CreateEnemyCount());
+                var newEnemies = _enemyFactory.GetEnemies(CreateEnemyCountFromDifficulty());
                 _activeEnemies.AddRange(newEnemies);
                 Console.WriteLine($"You encounter {newEnemies.Count} enemies!");
             }
@@ -143,7 +181,7 @@ public class Game {
 
                     _player.Health.Exhaust(1); // exhaust from attacking
 
-                    float damage = CalculateDamage(_player, target);
+                    float damage = GameHelper.CalculateDamage(_player, target);
                     var resultDamage = target.Health.Damage(damage);
                     Console.WriteLine($"You attack the {target.Name} for {Round(resultDamage)} damage.");
                 }
@@ -188,12 +226,8 @@ public class Game {
             break;
 
             case "rest":
-            if (_player.Health.HP >= _player.Health.MaxHP) {
-                Console.WriteLine($"You take a moment to rest, restoring some energy.");
-            }
-            else {
-                Console.WriteLine($"You take a moment to rest, restoring some health.");
-            }
+            Console.WriteLine($"You take a moment to rest, restoring some health.");
+
             _player.Health.Rest();
 
             if (_activeEnemies.Any()) {
@@ -235,7 +269,7 @@ public class Game {
             }
 
             enemy.Health.Exhaust(1); // they lose energy from attack
-            float damage = CalculateDamage(enemy, _player);
+            float damage = GameHelper.CalculateDamage(enemy, _player);
             var resultDamage = _player.Health.Damage(damage);
             Console.WriteLine($"The {enemy.Name} attacks you for {Round(resultDamage)} damage.");
         }
@@ -254,8 +288,10 @@ public class Game {
             else {
                 Console.WriteLine($"The {enemy.Name} has been defeated!");
             }
-            _player.Loot.Gold += enemy.Loot.Gold;
-            Console.WriteLine($"You loot {enemy.Loot.Gold} gold.");
+
+            var gold = (int)Math.Round((enemy.Loot.Gold * _player.Health.Luck));
+            _player.Loot.Gold += gold;
+            Console.WriteLine($"You loot {gold} gold.");
 
             _groundLoot.Add(enemy.Loot.Weapon);
             Console.WriteLine($"The {enemy.Name} dropped its {enemy.Loot.Weapon.Name}.");
@@ -276,13 +312,17 @@ public class Game {
     private void DisplayPlayerStatus (Player player) {
         Console.WriteLine($"\n--- Status ---");
         Console.WriteLine($"Player: {_player.Name} ({_player.Class})");
-        Console.WriteLine($"Health: {Round(_player.Health.HP, 0)}/{_player.Health.MaxHP} | Energy: {Round(_player.Health.Energy, 0)}/{_player.Health.MaxEnergy}");
+        Console.WriteLine($"" +
+            $"Health: {Round(_player.Health.HP, 0)}/{_player.Health.MaxHP} | " +
+            $"Energy: {Round(_player.Health.Energy, 0)}/{_player.Health.MaxEnergy} | " +
+            $"Fullness: {Round(_player.Health.Fullness, 0)}/{_player.Health.MaxFullness}");
+
         Console.WriteLine($"Gold: {_player.Loot.Gold}");
         Console.WriteLine($"Equipped: {_player.Loot.Weapon.Name} (Damage: {Round(_player.Loot.Weapon.BaseDamage)})");
         if (_player.Loot.Items.Any()) {
             Console.WriteLine($"Your Items {_player.Loot.Items.Count}/{_player.Loot.MaxItems}:");
-            for (int i = 0 ; i < _player.Loot.Items.Count ; i++) {
-                Console.WriteLine($"[{i + 1}] {_player.Loot.Items [i].Details()}");
+            for (int i = 0; i < _player.Loot.Items.Count; i++) {
+                Console.WriteLine($"[{i + 1}] {_player.Loot.Items[i].ToString()}");
             }
         }
         Console.WriteLine("\n----------------");
@@ -305,7 +345,7 @@ public class Game {
             Console.WriteLine("LOOT ON GROUND:");
             for (int i = 0; i < _groundLoot.Count; i++) {
                 var item = _groundLoot[i];
-                Console.WriteLine($"[{i + 1}] {item.Details()}");
+                Console.WriteLine($"[{i + 1}] {item.ToString()}");
             }
             Console.WriteLine("----------------\n");
         }
@@ -337,30 +377,6 @@ public class Game {
         Console.ReadLine();
     }
 
-    private float CalculateDamage (Entity entity, Entity target) {
-        float statMultiplier = 1.0f;
-        switch (entity.Loot.Weapon.ScalingType) {
-            case Weapon.StatType.Strength: statMultiplier = entity.Health.Strength; break;
-            case Weapon.StatType.Dexterity: statMultiplier = entity.Health.Dexterity; break;
-            case Weapon.StatType.Perception: statMultiplier = entity.Health.Perception; break;
-            case Weapon.StatType.Chakra: statMultiplier = entity.Health.Chakra; break;
-            default: break;
-        }
-
-        foreach (var item in entity.Loot.Items) {
-            statMultiplier *= item.StatMultiplier(statMultiplier, entity.Loot.Weapon);
-        }
-
-        switch (entity.Loot.Weapon.ScalingType) {
-            case Weapon.StatType.Strength:
-            statMultiplier *= Math.Min(1, Math.Max(1 - target.Health.Strength, 1));
-            break;
-        }
-
-        float damage = entity.Loot.Weapon.BaseDamage * entity.Health.Power * statMultiplier;
-        return damage;
-    }
-
     /// <summary>
     ///  Clear out the local area
     /// </summary>
@@ -369,20 +385,27 @@ public class Game {
         _groundLoot.Clear();
     }
 
-    private int CreateEnemyCount () {
+    private int CreateEnemyCountFromDifficulty () {
         int gold = _player.Loot.Gold;
         int items = _player.Loot.Items.Count;
 
-        int max = 1;
-        max += (int)Math.Floor(gold / 50f);
-        max += (int) Math.Floor(items / 5f);
+        // 1 item is as "threatening" as 10 gold
+        float wealthScore = (gold + (items * 10f)) * _settings.EnemyCountDifficultyScaling;
+
+        // base number of enemies to add to.
+        int baseEnemyCount = 1;
+        float scaling = 15f;
+
+        // scale with sqrt
+        int bonusEnemies = (int)Math.Floor(Math.Sqrt(wealthScore / scaling));
+
+        int max = baseEnemyCount + bonusEnemies;
 
         return _random.Next(1, max + 1);
     }
 
-
-    private float Round(float v, int digits = 1) {
-        if(digits == 0) return (float)(int)Math.Round(v, 1);
-        return (float) Math.Round(v,digits);
+    private float Round (float v, int digits = 1) {
+        if (digits == 0) return (int)Math.Round(v, 1);
+        return (float)Math.Round(v, digits);
     }
 }

@@ -1,10 +1,16 @@
 ﻿using Mini_aventyr;
+using Mini_aventyr.Entities;
+using Mini_aventyr.EntityComponents;
+using Mini_aventyr.Items;
 
 public class CharacterCreator {
+
     public class CharacterBuilder {
         public string Name { get; set; } = "Nameless";
         public string ClassName { get; set; } = "Amnesiac";
         public Weapon Weapon { get; set; } = new("Dining Fork", 1, Weapon.StatType.None);
+        public bool SelectedWeapon { get; set; }
+
         public List<Food> Food { get; set; } = new();
         public List<Trinket> Trinkets { get; set; } = new();
         public int MaxInventory { get; set; } = 5;
@@ -14,44 +20,80 @@ public class CharacterCreator {
         public float Dexterity { get; set; } = 1.0f;
         public float Perception { get; set; } = 1.0f;
         public float Chakra { get; set; } = 1.0f;
+        public float Luck { get; set; } = 1.0f;
+
+        public float Fullness { get; set; } = 1.0f;
+        public float MaxFullness { get; set; } = 1.0f;
+        public float PassiveHealing { get; set; } = 5.0f;
+        public float HpPerEnergy { get; set; } = 0.5f;
+
+
     }
 
     private CharacterBuilder _builder = new();
+    private GameSettings _settings = new();
+
+    public GameSettings GetSettings () {
+        return _settings;
+    }
 
     public Player CreatePlayer () {
-        var builder = _builder;
+        var b = _builder;
 
         Console.Clear();
         Console.WriteLine("You awaken in a dusty room, the taste of cheap ale, blood and regret on your tongue.");
         Console.WriteLine("A wry voice echoes from the corner. \"Took you long enough. The world didn't stop turning while you were drooling on my pillow.\"");
         Console.ReadKey();
+        Console.Clear();
 
         Console.WriteLine("\n\"Your head feels like it's been used as a drum,\" the voice continues. \"Let's try to piece things together. We'll start from the beginning... long before this mess.\"");
         Console.ReadKey();
+        Console.Clear();
 
         // recalling memories to build the character
-        RecallChildhood(builder);
-        RecallMotivation(builder);
-        RecallArrivalStory(builder);
-        RecallDefiningAction(builder);
-        RecallFinalMoments(builder);
-        ChooseStartingGear(builder);
-        ChoosePersonalTrinket(builder);
+        RecallChildhood(b);
+        Console.Clear();
+
+        RecallMotivation(b);
+        Console.Clear();
+
+        RecallArrivalStory(b);
+        Console.Clear();
+
+        RecallDefiningAction(b);
+        Console.Clear();
+
+        RecallFinalMoments(b);
+        Console.Clear();
+
+        ChooseStartingGear(b);
+        Console.Clear();
+
+        ChoosePersonalTrinket(b);
+        Console.Clear();
+
         ChooseName();
+        Console.Clear();
 
-        builder.ClassName = ClassNameHelper.DetermineClassName(builder);
-        Console.WriteLine($"\n\"So, a one might call you a '{builder.ClassName}',\" the voice says, sounding thoroughly unimpressed. \"Right then. Your tab is paid. The door is that way. Try not to die within the first five minutes. It's bad for business.\"");
+        b.ClassName = ClassNameHelper.DetermineClassName(b);
+        Console.WriteLine($"\n\"So, a one might call you a '{b.ClassName}',\" the voice says, sounding thoroughly unimpressed. \"Right then. Your tab is paid. The door is that way. Try not to die within the first five minutes. Corpses in the vicinity is bad for business.\"");
         Console.ReadKey();
+        Console.Clear();
 
-        Console.WriteLine("\nYou grab your " + builder.Weapon.Name + " and step out into the world.");
+        Console.WriteLine("\nYou grab your " + b.Weapon.Name + " and step out into the world.");
         Console.WriteLine("(Press Enter to begin your adventure...)");
         Console.ReadKey();
+        Console.Clear();
 
-        List<Item> combinedItems = [.. builder.Food, .. builder.Trinkets];
+        List<Item> combinedItems = [.. b.Food, .. b.Trinkets];
 
-        var health = new Health(builder.MaxHp, builder.MaxHp, builder.MaxEnergy, builder.MaxEnergy, builder.Strength, builder.Perception, builder.Dexterity, builder.Chakra);
-        var loot = new Loot(0, builder.Weapon, combinedItems, builder.MaxInventory);
-        return new Player(health, builder.ClassName, builder.Name, loot);
+        var health = new Health(b.MaxHp, b.MaxHp, b.MaxEnergy, b.MaxEnergy,
+            b.Strength, b.Perception, b.Dexterity, b.Chakra,
+            b.Luck,
+            b.Fullness, b.MaxFullness, b.PassiveHealing, b.HpPerEnergy);
+
+        var loot = new Loot(0, b.Weapon, combinedItems, b.MaxInventory);
+        return new Player(health, b.ClassName, b.Name, loot);
     }
 
     private void RecallChildhood (CharacterBuilder builder) {
@@ -72,7 +114,7 @@ public class CharacterCreator {
             builder.Strength += 0.2f;
             builder.MaxHp += 15;
             builder.Chakra -= 0.1f;
-            builder.Food.Add(new Food("Mother's Hearty Bread", 20));
+            builder.Food.Add(new Food("Mother's Hearty Bread", 10, 10, 0));
             break;
             case 2: // The Alley Cat
             Console.WriteLine("\"Learned to be quick with your hands and your feet, I see. Mostly with other people's things.\"");
@@ -114,7 +156,7 @@ public class CharacterCreator {
             builder.Dexterity += 0.1f;
             builder.Perception += 0.1f;
             builder.MaxInventory += 1;
-            builder.Trinkets.Add(new Trinket("Compass"));
+            builder.Trinkets.Add(new Trinket("Explorer's Compass"));
             break;
             case 2: // vengeance
             Console.WriteLine("\"Revenge. A fire that keeps you warm at night, until it burns you to a crisp. Good luck with that.\"");
@@ -126,6 +168,7 @@ public class CharacterCreator {
             Console.WriteLine("\"Chasing secrets. A noble pursuit. Usually ends with finding secrets that would have been better left alone.\"");
             builder.Chakra += 0.15f;
             builder.Perception += 0.15f;
+            builder.Trinkets.Add(new Trinket("Explorer's Compass"));
             break;
             case 4: // wanderlust
             Console.WriteLine("\"Running *from* something, or just running *to* anywhere else. The most tiring reason of all.\"");
@@ -152,7 +195,7 @@ public class CharacterCreator {
             builder.Strength += 0.3f;
             builder.MaxHp += 25;
             builder.Perception -= 0.1f;
-            builder.Food.Add(new Food("Caravan Ration", 10));
+            builder.Food.Add(new Food("Caravan Ration", 5, 5, 0));
             break;
             case 2: // Courier
             Console.WriteLine("\n\"A fleet-footed messenger, eh? More of a professional runaway, from the sound of it.\"");
@@ -199,7 +242,7 @@ public class CharacterCreator {
             Console.WriteLine("\"Pragmatic. Some would say cowardly. But you're alive and have lunch, so who's laughing?\"");
             builder.Dexterity += 0.2f;
             builder.MaxInventory += 2;
-            builder.Food.Add(new Food("Someone Else's Lunch", 15));
+            builder.Food.Add(new Food("Someone Else's Lunch", 8, 5, 0));
             break;
             case 4: // Diplomat
             Console.WriteLine("\"You tried to talk your way out of a fight? Audacious. And stupid. The results speak for themselves.\"");
@@ -212,7 +255,7 @@ public class CharacterCreator {
 
     private void RecallFinalMoments (CharacterBuilder builder) {
         int choice = GetChoice(
-            "\n\"We're almost there. The grand finale. What's the very last thing you remember before you started decorating my floor?\"",
+            "\n\"We're almost there. The grand finale. What's the very last thing you remember before you blacked out?\"",
             new[] {
                 "A fistfight over a card game. You think you were winning.",
                 "A deal gone wrong in a dark alley. You were handed a note just before the sap hit your head.",
@@ -258,20 +301,29 @@ public class CharacterCreator {
         switch (weaponChoice) {
             case 1:
             builder.Weapon = new Weapon("'Reliable' Broadsword", 6, Weapon.StatType.Strength);
+            builder.Strength += 0.05f;
             break;
             case 2:
             builder.Weapon = new Weapon("Balanced Daggers", 6, Weapon.StatType.Dexterity);
+            builder.Dexterity += 0.05f;
+
             break;
             case 3:
             builder.Weapon = new Weapon("Fine Crossbow", 6, Weapon.StatType.Perception);
+            builder.Perception += 0.05f;
+
             break;
             case 4:
             builder.Weapon = new Weapon("Crystal Orb", 6, Weapon.StatType.Chakra);
+            builder.Chakra += 0.05f;
+
             break;
             default:
-            builder.Weapon = new Weapon("Trusty Hatchet", 6, Weapon.StatType.None);
+            builder.Weapon = new Weapon("Ol' Trusty Hatchet", 4, Weapon.StatType.None);
+            builder.MaxEnergy += 3;
             break;
         }
+        builder.SelectedWeapon = true;
         Console.ReadKey();
     }
 
@@ -279,9 +331,10 @@ public class CharacterCreator {
         int choice = GetChoice(
             "\n\"Before you go, you check your pockets one last time. Besides the lint, you find one small, personal item.\"",
             new[] {
-                "A smooth river stone. It's cool to the touch and oddly comforting.",
+                "A smooth river stone. It's cool to the touch but oddly comforting.",
                 "A bent coin from a foreign land. You can't remember where you got it.",
-                "A single, perfectly preserved feather from an unknown bird."
+                "A single, perfectly preserved feather from an unknown bird.",
+                "A ugly broken mechanical stopwatch.",
             }
         );
 
@@ -302,6 +355,11 @@ public class CharacterCreator {
             builder.MaxEnergy += 5;
             builder.Trinkets.Add(new Trinket("Perfect Feather"));
             break;
+            case 4: // Stopwatch
+            Console.WriteLine("\"A handy gadget. If it worked. You don't remember where or how you got it, and even though it looks like junk, it feels important.\"");
+            builder.Chakra += 0.03f;
+            builder.Trinkets.Add(new Trinket("Broken Stopwatch"));
+            break;
         }
         Console.ReadKey();
     }
@@ -313,7 +371,7 @@ public class CharacterCreator {
             name = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(name)) Console.WriteLine("\"Mumbling won't get you anywhere. Spit it out!\"");
         }
-        _builder.Name = name;
+        _builder.Name = name.Trim();
         Console.WriteLine($"\n\"{_builder.Name}, eh? Doesn't ring a bell,\" the voice muses.");
         Console.ReadKey();
     }

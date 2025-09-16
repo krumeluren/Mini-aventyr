@@ -1,4 +1,4 @@
-﻿namespace Mini_aventyr;
+﻿namespace Mini_aventyr.Items;
 public class Trinket : Item {
     public override string Name { get; }
     public Weapon.StatType StatType { get; }
@@ -7,7 +7,7 @@ public class Trinket : Item {
         StatType = statType;
     }
 
-    public override string Details () {
+    public override string ToString () {
         return $"{Name}";
     }
 

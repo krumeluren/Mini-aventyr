@@ -1,5 +1,10 @@
-﻿namespace Mini_aventyr;
+﻿using Mini_aventyr.Items;
 
+namespace Mini_aventyr.EntityComponents;
+
+/// <summary>
+/// Inventory of an entity
+/// </summary>
 public class Loot {
     public int Gold { get; set; }
     public Weapon Weapon { get; set; }

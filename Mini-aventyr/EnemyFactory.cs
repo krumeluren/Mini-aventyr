@@ -1,4 +1,7 @@
 ﻿
+using Mini_aventyr.Entities;
+using Mini_aventyr.EntityComponents;
+using Mini_aventyr.Items;
 
 namespace Mini_aventyr;
 
@@ -17,7 +20,7 @@ public class EnemyFactory {
 
             // Pick a random weapon
             var weaponData = GameData.Weapons[_random.Next(GameData.Weapons.Count)];
-            var enemyWeapon = new Weapon(weaponData.Name, weaponData.Damage);
+            var enemyWeapon = new Weapon(weaponData.Name, weaponData.Damage, weaponData.StatType);
 
             var itemsToDrop = new List<Item>();
             int foodDropCount = _random.Next(enemyBase.MinLoot, enemyBase.MaxLoot + 1); // +1 because the random upper range is exclusive
@@ -25,7 +28,7 @@ public class EnemyFactory {
             // create that many random food items.
             for (int j = 0; j < foodDropCount; j++) {
                 var foodData = GameData.Food[_random.Next(GameData.Food.Count)];
-                itemsToDrop.Add(new Food(foodData.Name, foodData.Energy));
+                itemsToDrop.Add(new Food(foodData.Name, foodData.Energy, foodData.Satiety, foodData.Healing));
             }
 
             int goldAmount = _random.Next(enemyBase.MinGold, enemyBase.MaxGold);
@@ -38,7 +41,9 @@ public class EnemyFactory {
             var enemyHealth = new Health(
                   enemyBase.MaxHp, enemyBase.MaxHp,
                   enemyBase.MaxEnergy, enemyBase.MaxEnergy,
-                  randomizedStr, randomizedPrc, randomizedDex, randomizedChk
+                  randomizedStr, randomizedPrc, randomizedDex, randomizedChk,
+
+                  luck: 1, fullness: 100, maxFullness: 100, passiveHealing: 2, hpPerEnergy: 0.5f // enemies dont use these anyway
               );
 
             var newEnemy = new Enemy(enemyHealth, enemyBase.Name, enemyLoot);
@@ -48,7 +53,7 @@ public class EnemyFactory {
         return generatedEnemies;
     }
     /// <summary>
-    /// Takes a base stat value and returns a new value that is +- 20%
+    /// Takes a base stat value and return a new value that is +- 20%
     /// </summary>
     private float RandomizeStat (float baseValue) {
         // random multiplier between 0.8 an d1.2

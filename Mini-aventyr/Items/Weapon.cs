@@ -1,4 +1,4 @@
-﻿namespace Mini_aventyr;
+﻿namespace Mini_aventyr.Items;
 public class Weapon : Item {
     public override string Name { get; }
     public float BaseDamage { get; }
@@ -11,11 +11,11 @@ public class Weapon : Item {
         ScalingType = scalingType;
     }
 
-    public override string Details () {
+    public override string ToString () {
         return $"Weapon {Name} (Base Damage: {BaseDamage})";
     }
 
-    public override float StatMultiplier (float statMultiplier,Weapon weapon) {
+    public override float StatMultiplier (float statMultiplier, Weapon weapon) {
         return 1;
     }
 
