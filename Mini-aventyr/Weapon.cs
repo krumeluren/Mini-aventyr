@@ -15,5 +15,9 @@ public class Weapon : Item {
         return $"Weapon {Name} (Base Damage: {BaseDamage})";
     }
 
+    public override float StatMultiplier (float statMultiplier,Weapon weapon) {
+        return 1;
+    }
+
     public enum StatType { None, Dexterity, Strength, Perception, Chakra };
 }

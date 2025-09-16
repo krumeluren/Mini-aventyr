@@ -1,9 +1,7 @@
 ﻿namespace Mini_aventyr;
 
-public class Enemy {
+public class Enemy : Entity {
     public string Name { get; private set; }
-    public readonly Health Health;
-    public readonly Loot Loot;
     public bool HasPrepared { get; set; } = false; // if the enemy will get a initial turn to attack
 
     /// <summary>
@@ -11,10 +9,8 @@ public class Enemy {
     /// </summary>
     public bool IsAnalyzed { get; set; }
 
-    public Enemy (Health health, string name, Loot loot) {
-        Health = health;
+    public Enemy (Health health, string name, Loot loot) : base(health, loot) {
         Name = name;
-        Loot = loot;
     }
 
     /// <param name="listIndex">The 0 based index</param>
@@ -48,6 +44,32 @@ public class Enemy {
         else if (maxStat == Health.Dexterity) attributeDescription = "remarkably agile";
         else if (maxStat == Health.Perception) attributeDescription = "dangerously alert";
         else if (maxStat == Health.Chakra) attributeDescription = "crackling with energy";
+
+        if(Health.Strength >= 2) {
+
+        }
+        else if (Health.Strength <= 0.5) {
+
+        }
+
+        if (Health.Dexterity >= 2) {
+
+        } else if (Health.Dexterity <= 0.5) {
+
+        }
+
+        if (Health.Perception >= 2) {
+
+        } else if (Health.Perception <= 0.5) {
+
+        }
+
+        if (Health.Chakra >= 2) {
+
+        } else if (Health.Chakra <= 0.5) {
+
+        }
+
 
         string energyStatus = "";
         float energyPercent = Health.Power;

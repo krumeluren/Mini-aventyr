@@ -1,20 +1,17 @@
-﻿
-
-
-namespace Mini_aventyr;
+﻿namespace Mini_aventyr;
 
 public class Loot {
     public int Gold { get; set; }
     public Weapon Weapon { get; set; }
 
-    public int MaxFood { get; }
+    public int MaxItems { get; }
     public readonly List<Item> Items = new();
 
     public Loot (int gold, Weapon weapon, List<Item> items, int maxItems = 3) {
         Weapon = weapon;
         Gold = gold;
         Items = items;
-        MaxFood = maxItems;
+        MaxItems = maxItems;
     }
 
     /// <returns>A potential item that was dropped</returns>
@@ -25,7 +22,7 @@ public class Loot {
             Weapon = weapon;
         }
         else {
-            if (Items.Count >= MaxFood) {
+            if (Items.Count >= MaxItems) {
                 // bag is full get the last item
                 dropped = Items[Items.Count - 1];
                 // Remove it from the inventory.

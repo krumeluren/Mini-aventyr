@@ -1,8 +1,5 @@
 ﻿
-
-
 namespace Mini_aventyr;
-
 public class Food : Item {
     public override string Name { get; }
     public readonly float Energy;
@@ -13,5 +10,9 @@ public class Food : Item {
 
     public override string Details () {
         return $"{Name} (+{Energy})";
+    }
+
+    public override float StatMultiplier (float statMultiplier, Weapon weapon) {
+        return 1;
     }
 }

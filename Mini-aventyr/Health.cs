@@ -3,19 +3,15 @@
 
 namespace Mini_aventyr;
 public class Health {
-
-
     public float MaxHP { get; private set; }
     public float HP { get; private set; }
 
     public readonly float MaxEnergy;
     public float Energy { get; private set; }
-
     public float Strength { get; }
     public float Perception { get; }
     public float Dexterity { get; }
     public float Chakra { get; }
-
     public float Power => Energy / MaxEnergy < 0.3f ? 0.3f : Energy / MaxEnergy; // scale down power to as little as 30%
 
     public bool IsDead => HP <= 0 || Energy <= 0;
@@ -29,7 +25,6 @@ public class Health {
         Dexterity = dexterity;
         Chakra = chakra;
     }
-
     public void Rest () {
         // Restore energy by adding a fraction of the missing amount
         // This makes it approach max but never reach it
@@ -37,7 +32,6 @@ public class Health {
         Energize(missingEnergy * 0.25f * Chakra);// Restore 25% of the missing energy
         Heal(10); // Heal 10
     }
-
     /// <returns>Damage dealt</returns>
     public float Damage (float damage) {
         float dmg = 0;
@@ -48,7 +42,6 @@ public class Health {
         if (HP < 0) HP = 0; // prevent negative health
         return dmg;
     }
-
     public void Exhaust (float baseEnergyLoss) {
         if (Dexterity > 0) Energy -= baseEnergyLoss / Dexterity;
         else Energy -= baseEnergyLoss;
@@ -56,8 +49,6 @@ public class Health {
 
         if (Energy <= 0) Energy = 0;
     }
-
-
     public void Heal (float baseHeal) {
         float restEffectiveness = (Energy / MaxEnergy);
         HP += restEffectiveness * baseHeal * Chakra;
@@ -74,4 +65,3 @@ public class Health {
 
     }
 }
-
