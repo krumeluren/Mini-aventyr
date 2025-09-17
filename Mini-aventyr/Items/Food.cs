@@ -2,13 +2,13 @@
 public class Food : Item {
     public override string Name { get; }
     public float Energy { get; }
-    public float Satiety { get; }
+    public float Fullness { get; }
     public float Healing { get; }
 
-    public Food (string name, float energy, float satiety, float healing) {
+    public Food (string name, float energy, float fullness, float healing) {
         Name = name;
         Energy = energy;
-        Satiety = satiety;
+        Fullness = fullness;
         Healing = healing;
     }
 
@@ -16,7 +16,7 @@ public class Food : Item {
         var effects = new List<string>();
         if (Healing > 0) effects.Add($"HP: +{Healing}");
         if (Energy > 0) effects.Add($"Energy: +{Energy}");
-        if (Satiety > 0) effects.Add($"Satiety: +{Satiety}");
+        if (Fullness > 0) effects.Add($"Fullness: +{Fullness}");
         return effects.Any() ? $"{Name} ({string.Join(", ", effects)})" : Name;
     }
 

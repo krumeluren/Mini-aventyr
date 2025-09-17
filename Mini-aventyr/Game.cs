@@ -121,7 +121,7 @@ public class Game {
                         var effects = new List<string>();
                         if (food.Healing > 0) effects.Add($"healing {food.Healing} HP");
                         if (food.Energy > 0) effects.Add($"restoring {food.Energy} energy");
-                        if (food.Satiety > 0) effects.Add($"filling you up by {food.Satiety}");
+                        if (food.Fullness > 0) effects.Add($"filling you up by {food.Fullness}");
                         string effectsString = string.Join(", ", effects);
 
                         if (!string.IsNullOrEmpty(effectsString)) {

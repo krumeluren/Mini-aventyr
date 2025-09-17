@@ -6,7 +6,7 @@ namespace Mini_aventyr;
 
 public record EnemyTemplate (string Name, int MaxHp, float MaxEnergy, int MinLoot = 0, int MaxLoot = 3, int MinGold = 0, int MaxGold = 0, float Str = 1, float Dex = 1, float Prc = 1, float Chk = 1);
 public record WeaponTemplate (string Name, float Damage, Weapon.StatType StatType);
-public record FoodTemplate (string Name, float Energy, float Satiety, float Healing);
+public record FoodTemplate (string Name, float Energy, float Fullness, float Healing);
 
 // A static class to hold predefined data
 public static class GameData {

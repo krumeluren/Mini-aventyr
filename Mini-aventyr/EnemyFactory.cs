@@ -28,7 +28,7 @@ public class EnemyFactory {
             // create that many random food items.
             for (int j = 0; j < foodDropCount; j++) {
                 var foodData = GameData.Food[_random.Next(GameData.Food.Count)];
-                itemsToDrop.Add(new Food(foodData.Name, foodData.Energy, foodData.Satiety, foodData.Healing));
+                itemsToDrop.Add(new Food(foodData.Name, foodData.Energy, foodData.Fullness, foodData.Healing));
             }
 
             int goldAmount = _random.Next(enemyBase.MinGold, enemyBase.MaxGold);

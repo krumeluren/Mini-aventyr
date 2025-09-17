@@ -102,7 +102,7 @@ public class Health {
             return false;
         }
 
-        Fullness += food.Satiety;
+        Fullness += food.Fullness;
         Energize(food.Energy);
         DirectHeal(food.Healing);
 
