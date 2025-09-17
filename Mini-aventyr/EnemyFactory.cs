@@ -53,11 +53,11 @@ public class EnemyFactory {
         return generatedEnemies;
     }
     /// <summary>
-    /// Takes a base stat value and return a new value that is +- 20%
+    /// Takes a base stat value and return a new value that is +- 50%
     /// </summary>
     private float RandomizeStat (float baseValue) {
-        // random multiplier between 0.8 an d1.2
-        float multiplier = 0.8f + (float)(_random.NextDouble() * 0.4f);
+        // random multiplier between 0.5 an d1.5
+        float multiplier = 0.5f + (float)(_random.NextDouble() * 1.5f);
         return baseValue * multiplier;
     }
 }
