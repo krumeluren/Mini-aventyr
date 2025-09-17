@@ -371,9 +371,7 @@ public class Game {
         else if (_player.Health.Energy <= 0) {
             Console.WriteLine("You succumbed from exhaustion");
         }
-        else {
-            Console.WriteLine($"You finished with {_player.Loot.Gold} gold.");
-        }
+        Console.WriteLine($"You finished with {_player.Loot.Gold} gold.");
         Console.ReadLine();
     }
 
