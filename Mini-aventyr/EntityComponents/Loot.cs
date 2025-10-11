@@ -1,4 +1,4 @@
-﻿using Mini_aventyr.Items;
+﻿using Mini_aventyr.Interfaces;
 
 namespace Mini_aventyr.EntityComponents;
 
@@ -7,12 +7,12 @@ namespace Mini_aventyr.EntityComponents;
 /// </summary>
 public class Loot {
     public int Gold { get; set; }
-    public Weapon Weapon { get; set; }
+    public IWeapon Weapon { get; set; }
 
     public int MaxItems { get; }
-    public readonly List<Item> Items = new();
+    public readonly List<IItem> Items = new();
 
-    public Loot (int gold, Weapon weapon, List<Item> items, int maxItems = 3) {
+    public Loot (int gold, IWeapon weapon, List<IItem> items, int maxItems = 3) {
         Weapon = weapon;
         Gold = gold;
         Items = items;
@@ -20,9 +20,9 @@ public class Loot {
     }
 
     /// <returns>A potential item that was dropped</returns>
-    public Item? Take (Item newItem) {
-        Item? dropped = null; // Start by assuming nothing is dropped
-        if (newItem is Weapon weapon) {
+    public IItem? Take (IItem newItem) {
+        IItem? dropped = null; // Start by assuming nothing is dropped
+        if (newItem is IWeapon weapon) {
             dropped = Weapon;
             Weapon = weapon;
         }

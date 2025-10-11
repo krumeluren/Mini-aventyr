@@ -1,5 +1,5 @@
 ﻿using Mini_aventyr.Entities;
-using Mini_aventyr.Items;
+using Mini_aventyr.Interfaces;
 
 namespace Mini_aventyr;
 
@@ -13,7 +13,7 @@ public class Game {
 
     private readonly List<Enemy> _activeEnemies = new();
 
-    private readonly List<Item> _groundLoot = new();
+    private readonly List<IItem> _groundLoot = new();
 
     public Game (Player player, GameSettings settings) {
         _player = player;
@@ -113,22 +113,22 @@ public class Game {
             index -= 1; // adjusted for 0 based list
             if (index >= 0 && index < _player.Loot.Items.Count) {
                 var selectedItem = _player.Loot.Items[index];
-                if (selectedItem is Food food) {
-                    bool didConsume = _player.Health.Consume(food);
+                if (selectedItem is IEdible edible) {
+                    bool didConsume = _player.Health.Consume(edible);
                     if (didConsume) {
                         _player.Loot.Items.RemoveAt(index);
 
                         var effects = new List<string>();
-                        if (food.Healing > 0) effects.Add($"healing {food.Healing} HP");
-                        if (food.Energy > 0) effects.Add($"restoring {food.Energy} energy");
-                        if (food.Fullness > 0) effects.Add($"filling you up by {food.Fullness}");
+                        if (edible.Healing > 0) effects.Add($"healing {edible.Healing} HP");
+                        if (edible.Energy > 0) effects.Add($"restoring {edible.Energy} energy");
+                        if (edible.Fullness > 0) effects.Add($"filling you up by {edible.Fullness}");
                         string effectsString = string.Join(", ", effects);
 
                         if (!string.IsNullOrEmpty(effectsString)) {
-                            Console.WriteLine($"You consume the {food.Name}, {effectsString}.");
+                            Console.WriteLine($"You consume the {selectedItem.Name}, {effectsString}.");
                         }
                         else {
-                            Console.WriteLine($"You consume the {food.Name}.");
+                            Console.WriteLine($"You consume the {selectedItem.Name}.");
                         }
 
                         if (_player.Health.IsBloated) {
@@ -208,12 +208,12 @@ public class Game {
                 }
 
                 if (targetIndex >= 0 && targetIndex < _groundLoot.Count) {
-                    Item itemToTake = _groundLoot[targetIndex];
+                    IItem itemToTake = _groundLoot[targetIndex];
 
                     Console.WriteLine($"You pick up the {itemToTake.Name}.");
                     _groundLoot.Remove(itemToTake);
 
-                    Item? dropped = _player.Loot.Take(itemToTake);
+                    IItem? dropped = _player.Loot.Take(itemToTake);
                     if (dropped != null) {
                         Console.WriteLine($"You drop your {dropped.Name} on the ground.");
                         _groundLoot.Add(dropped);

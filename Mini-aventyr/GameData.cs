@@ -1,11 +1,12 @@
 ﻿
 
-using Mini_aventyr.Items;
+using Mini_aventyr.Interfaces;
+using static Mini_aventyr.Interfaces.IWeapon;
 
 namespace Mini_aventyr;
 
 public record EnemyTemplate (string Name, int MaxHp, float MaxEnergy, int MinLoot = 0, int MaxLoot = 3, int MinGold = 0, int MaxGold = 0, float Str = 1, float Dex = 1, float Prc = 1, float Chk = 1);
-public record WeaponTemplate (string Name, float Damage, Weapon.StatType StatType);
+public record WeaponTemplate (string Name, float Damage, StatType StatType);
 public record FoodTemplate (string Name, float Energy, float Fullness, float Healing);
 
 // A static class to hold predefined data
@@ -49,33 +50,33 @@ public static class GameData {
     public static readonly List<WeaponTemplate> Weapons = new()
     {
         // Unaligned Weapons
-        new("Stick", 1, Weapon.StatType.None),
-        new("Cast Iron Pan", 3, Weapon.StatType.None),
-        new("Hatchet", 5, Weapon.StatType.None),
-        new("Pitchfork", 7, Weapon.StatType.None),
+        new("Stick", 1, IWeapon.StatType.None),
+        new("Cast Iron Pan", 3, IWeapon.StatType.None),
+        new("Hatchet", 5, IWeapon.StatType.None),
+        new("Pitchfork", 7, IWeapon.StatType.None),
 
         // Strength 
-        new("Heavy Branch", 2, Weapon.StatType.Strength),
-        new("Cracked Bone Club", 6, Weapon.StatType.Strength),
-        new("Iron Mace", 8, Weapon.StatType.Strength),
-        new("Zweihander", 10, Weapon.StatType.Strength),
+        new("Heavy Branch", 2, IWeapon.StatType.Strength),
+        new("Cracked Bone Club", 6, IWeapon.StatType.Strength),
+        new("Iron Mace", 8, IWeapon.StatType.Strength),
+        new("Zweihander", 10, IWeapon.StatType.Strength),
 
         // Dexterity
-        new("Sharp Stone", 2, Weapon.StatType.Dexterity),
-        new("Rusty Dagger", 6, Weapon.StatType.Dexterity),
-        new("Brass Knuckles", 8, Weapon.StatType.Dexterity),
-        new("Rapier", 10, Weapon.StatType.Dexterity),
+        new("Sharp Stone", 2, IWeapon.StatType.Dexterity),
+        new("Rusty Dagger", 6, IWeapon.StatType.Dexterity),
+        new("Brass Knuckles", 8, IWeapon.StatType.Dexterity),
+        new("Rapier", 10, IWeapon.StatType.Dexterity),
 
         // Perception
-        new("Wooden Slingshot", 2, Weapon.StatType.Perception),
-        new("Broken Scalpel", 6, Weapon.StatType.Perception),
-        new("Whip", 8, Weapon.StatType.Perception),
-        new("Poison Darts", 10, Weapon.StatType.Perception),
+        new("Wooden Slingshot", 2, IWeapon.StatType.Perception),
+        new("Broken Scalpel", 6, IWeapon.StatType.Perception),
+        new("Whip", 8, IWeapon.StatType.Perception),
+        new("Poison Darts", 10, IWeapon.StatType.Perception),
 
         // Chakra
-        new("Lucky Stone", 2, Weapon.StatType.Chakra),
-        new("Weird Facemask", 6, Weapon.StatType.Chakra),
-        new("Talisman", 8, Weapon.StatType.Chakra),
-        new("Runic Totem", 10, Weapon.StatType.Chakra),
+        new("Lucky Stone", 2, IWeapon.StatType.Chakra),
+        new("Weird Facemask", 6, IWeapon.StatType.Chakra),
+        new("Talisman", 8, IWeapon.StatType.Chakra),
+        new("Runic Totem", 10, IWeapon.StatType.Chakra),
     };
 }

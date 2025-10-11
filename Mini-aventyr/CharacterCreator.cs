@@ -1,6 +1,7 @@
 ﻿using Mini_aventyr;
 using Mini_aventyr.Entities;
 using Mini_aventyr.EntityComponents;
+using Mini_aventyr.Interfaces;
 using Mini_aventyr.Items;
 
 public class CharacterCreator {
@@ -8,7 +9,7 @@ public class CharacterCreator {
     public class CharacterBuilder {
         public string Name { get; set; } = "Nameless";
         public string ClassName { get; set; } = "Amnesiac";
-        public Weapon Weapon { get; set; } = new("Broken Chair Leg", 1, Weapon.StatType.None);
+        public Weapon Weapon { get; set; } = new("Broken Chair Leg", 1, IWeapon.StatType.None);
         public bool SelectedWeapon { get; set; }
 
         public List<Food> Food { get; set; } = new();
@@ -116,7 +117,7 @@ public class CharacterCreator {
         Console.ReadKey();
         Console.Clear();
 
-        List<Item> combinedItems = [.. b.Food, .. b.Trinkets];
+        List<IItem> combinedItems = [.. b.Food, .. b.Trinkets];
 
         var health = new Health(b.MaxHp, b.MaxHp, b.MaxEnergy, b.MaxEnergy,
             b.Strength, b.Perception, b.Dexterity, b.Chakra,
@@ -231,7 +232,7 @@ public class CharacterCreator {
 
             case 2:
             Console.WriteLine("\"Traded arcane mastery for cheap tavern gigs and rhyming 'ale' with 'pale'. A bold artistic choice. I assume it didn't paid the bills, given your current... situation.\"");
-            builder.Weapon = new Weapon("Lute", 6, Weapon.StatType.None);
+            builder.Weapon = new Weapon("Lute", 6, IWeapon.StatType.None);
             builder.SelectedWeapon = true;
             builder.Chakra += 0.05f;
             builder.Dexterity += 0.1f;
@@ -259,7 +260,7 @@ public class CharacterCreator {
             builder.MaxHp -= 10;
             builder.MaxFullness -= 3;
             builder.Fullness += 3;
-            builder.Weapon = new Weapon("Broken Ancestral Staff", 6, Weapon.StatType.Dexterity);
+            builder.Weapon = new Weapon("Broken Ancestral Staff", 6, IWeapon.StatType.Dexterity);
             builder.SelectedWeapon = true;
 
             builder.Food.Add(new("Dried Herbs", 2, 1, 10));
@@ -460,26 +461,26 @@ public class CharacterCreator {
 
         switch (weaponChoice) {
             case 1:
-            builder.Weapon = new Weapon("'Reliable' Broadsword", 6, Weapon.StatType.Strength);
+            builder.Weapon = new Weapon("'Reliable' Broadsword", 6, IWeapon.StatType.Strength);
             builder.Strength += 0.05f;
             break;
             case 2:
-            builder.Weapon = new Weapon("Balanced Daggers", 6, Weapon.StatType.Dexterity);
+            builder.Weapon = new Weapon("Balanced Daggers", 6, IWeapon.StatType.Dexterity);
             builder.Dexterity += 0.05f;
 
             break;
             case 3:
-            builder.Weapon = new Weapon("Fine Crossbow", 6, Weapon.StatType.Perception);
+            builder.Weapon = new Weapon("Fine Crossbow", 6, IWeapon.StatType.Perception);
             builder.Perception += 0.05f;
 
             break;
             case 4:
-            builder.Weapon = new Weapon("Crystal Orb", 6, Weapon.StatType.Chakra);
+            builder.Weapon = new Weapon("Crystal Orb", 6, IWeapon.StatType.Chakra);
             builder.Chakra += 0.05f;
 
             break;
             default:
-            builder.Weapon = new Weapon("Ol' Trusty Hatchet", 4, Weapon.StatType.None);
+            builder.Weapon = new Weapon("Ol' Trusty Hatchet", 4, IWeapon.StatType.None);
             builder.MaxEnergy += 3;
             builder.Luck += 0.05f;
             break;

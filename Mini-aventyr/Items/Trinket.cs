@@ -1,8 +1,10 @@
-﻿namespace Mini_aventyr.Items;
-public class Trinket : Item {
-    public override string Name { get; }
-    public Weapon.StatType StatType { get; }
-    public Trinket (string name, Weapon.StatType statType = Weapon.StatType.None) {
+﻿using Mini_aventyr.Interfaces;
+
+namespace Mini_aventyr.Items;
+public class Trinket : IItem, IStatMultiplier {
+    public string Name { get; }
+    public IWeapon.StatType StatType { get; }
+    public Trinket (string name, IWeapon.StatType statType = IWeapon.StatType.None) {
         Name = name;
         StatType = statType;
     }
@@ -11,7 +13,7 @@ public class Trinket : Item {
         return $"{Name}";
     }
 
-    public override float StatMultiplier (float statMultiplier, Weapon weapon) {
+    float IStatMultiplier.StatMultiplier (float statMultiplier, IWeapon weapon) {
         if (StatType == weapon.ScalingType) {
             return statMultiplier *= 1.05f;
         }

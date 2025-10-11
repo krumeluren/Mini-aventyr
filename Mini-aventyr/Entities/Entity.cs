@@ -1,11 +1,11 @@
 ﻿using Mini_aventyr.EntityComponents;
-using Mini_aventyr.Items;
+using Mini_aventyr.Interfaces;
 
 namespace Mini_aventyr.Entities;
 public abstract class Entity {
     public string Name { get; }
 
-    public readonly Health Health;
+    public readonly IHealth Health;
     public readonly Loot Loot;
 
     /// <summary>
@@ -14,7 +14,7 @@ public abstract class Entity {
     public bool IsAnalyzed { get; set; }
 
 
-    protected Entity (Health health, Loot loot, string name) {
+    protected Entity (IHealth health, Loot loot, string name) {
         Health = health;
         Loot = loot;
         Name = name;
@@ -33,7 +33,7 @@ public abstract class Entity {
     }
 
     private string GetWeaponInfo () {
-        Weapon w = Loot.Weapon;
+        IWeapon w = Loot.Weapon;
         if (IsAnalyzed) {
             return $"{w.Name} (Base Dmg: {w.BaseDamage}, Scaling: {w.ScalingType})";
         }

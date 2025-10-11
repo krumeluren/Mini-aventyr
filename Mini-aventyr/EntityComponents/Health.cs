@@ -1,17 +1,17 @@
-﻿using Mini_aventyr.Items;
+﻿using Mini_aventyr.Interfaces;
 
 namespace Mini_aventyr.EntityComponents;
-public class Health {
+public class Health : IHealth {
     public float MaxHP { get; private set; }
     public float HP { get; private set; }
-
-    public readonly float MaxEnergy;
+    public float MaxEnergy { get; }
     public float Energy { get; private set; }
     public float Strength { get; }
     public float Perception { get; }
     public float Dexterity { get; }
     public float Chakra { get; }
     public float Luck { get; }
+
 
     public float MaxFullness { get; } = 15;
     public float Fullness { get; private set; } = 5;
@@ -96,15 +96,15 @@ public class Health {
         if (Energy <= 0) Energy = 0;
     }
 
-    public bool Consume (Food food) {
+    public bool Consume (IEdible edible) {
         // cant eat if you are full
         if (Fullness >= MaxFullness) {
             return false;
         }
 
-        Fullness += food.Fullness;
-        Energize(food.Energy);
-        DirectHeal(food.Healing);
+        Fullness += edible.Fullness;
+        Energize(edible.Energy);
+        DirectHeal(edible.Healing);
 
         return true;
     }

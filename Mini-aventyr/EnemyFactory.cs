@@ -1,6 +1,7 @@
 ﻿
 using Mini_aventyr.Entities;
 using Mini_aventyr.EntityComponents;
+using Mini_aventyr.Interfaces;
 using Mini_aventyr.Items;
 
 namespace Mini_aventyr;
@@ -22,7 +23,7 @@ public class EnemyFactory {
             var weaponData = GameData.Weapons[_random.Next(GameData.Weapons.Count)];
             var enemyWeapon = new Weapon(weaponData.Name, weaponData.Damage, weaponData.StatType);
 
-            var itemsToDrop = new List<Item>();
+            var itemsToDrop = new List<IItem>();
             int foodDropCount = _random.Next(enemyBase.MinLoot, enemyBase.MaxLoot + 1); // +1 because the random upper range is exclusive
 
             // create that many random food items.

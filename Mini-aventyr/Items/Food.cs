@@ -1,6 +1,8 @@
-﻿namespace Mini_aventyr.Items;
-public class Food : Item {
-    public override string Name { get; }
+﻿using Mini_aventyr.Interfaces;
+
+namespace Mini_aventyr.Items;
+public class Food : IItem, IEdible {
+    public string Name { get; }
     public float Energy { get; }
     public float Fullness { get; }
     public float Healing { get; }
@@ -18,9 +20,5 @@ public class Food : Item {
         if (Energy > 0) effects.Add($"Energy: +{Energy}");
         if (Fullness > 0) effects.Add($"Fullness: +{Fullness}");
         return effects.Any() ? $"{Name} ({string.Join(", ", effects)})" : Name;
-    }
-
-    public override float StatMultiplier (float statMultiplier, Weapon weapon) {
-        return 1;
     }
 }

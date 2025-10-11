@@ -1,5 +1,5 @@
 ﻿using Mini_aventyr.Entities;
-using Mini_aventyr.Items;
+using Mini_aventyr.Interfaces;
 
 namespace Mini_aventyr;
 
@@ -14,10 +14,10 @@ public static class GameHelper {
         // Step 1:
         // scales weapon with related entity stat
         switch (source.Loot.Weapon.ScalingType) {
-            case Weapon.StatType.Strength: weaponModifier = source.Health.Strength; break;
-            case Weapon.StatType.Dexterity: weaponModifier = source.Health.Dexterity; break;
-            case Weapon.StatType.Perception: weaponModifier = source.Health.Perception; break;
-            case Weapon.StatType.Chakra: weaponModifier = source.Health.Chakra; break;
+            case IWeapon.StatType.Strength: weaponModifier = source.Health.Strength; break;
+            case IWeapon.StatType.Dexterity: weaponModifier = source.Health.Dexterity; break;
+            case IWeapon.StatType.Perception: weaponModifier = source.Health.Perception; break;
+            case IWeapon.StatType.Chakra: weaponModifier = source.Health.Chakra; break;
             default: break;
         }
 
@@ -26,7 +26,9 @@ public static class GameHelper {
         // each item in inventory has a chance to return a stat modifier
         float itemsModifier = 1f;
         foreach (var item in source.Loot.Items) {
-            itemsModifier *= item.StatMultiplier(itemsModifier, source.Loot.Weapon);
+            if (item is IStatMultiplier statMultiplier) {
+                itemsModifier *= statMultiplier.StatMultiplier(itemsModifier, source.Loot.Weapon);
+            }
         }
 
 
@@ -34,10 +36,10 @@ public static class GameHelper {
         // The enemy will have more resiliance by weapon type. Ie a STR weapon is less effective on a high STR target
         float enemyResilianceModifier = 1.0f;
         switch (source.Loot.Weapon.ScalingType) {
-            case Weapon.StatType.Strength: enemyResilianceModifier = target.Health.Strength; break;
-            case Weapon.StatType.Dexterity: enemyResilianceModifier = target.Health.Dexterity; break;
-            case Weapon.StatType.Perception: enemyResilianceModifier = target.Health.Perception; break;
-            case Weapon.StatType.Chakra: enemyResilianceModifier = target.Health.Chakra; break;
+            case IWeapon.StatType.Strength: enemyResilianceModifier = target.Health.Strength; break;
+            case IWeapon.StatType.Dexterity: enemyResilianceModifier = target.Health.Dexterity; break;
+            case IWeapon.StatType.Perception: enemyResilianceModifier = target.Health.Perception; break;
+            case IWeapon.StatType.Chakra: enemyResilianceModifier = target.Health.Chakra; break;
             default: break;
         }
         // invert the modifier to provide resistance. ie 1 / 1.5 = 0.66..
